@@ -1,0 +1,19 @@
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    baseline-version: 0
+    table: TEMPERATURE_API_FLYWAY_SCHEMA_HISTORY
+mqtt:
+  url: ${MQTT_URL}
+  topics: ${MQTT_TOPICS}
+
+logging:
+  level:
+    club.mascotfan.temperature_api.MessageHandlerService: DEBUG
+    club.mascotfan.temperature_api.config.MqttConfig: TRACE
