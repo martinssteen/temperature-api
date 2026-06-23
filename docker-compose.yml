@@ -1,9 +1,0 @@
-services:
-  temperature-api:
-    build: .
-    container_name: temperature-api
-    restart: unless-stopped
-    ports:
-      - "8080:6040"
-    env_file:
-      - .env

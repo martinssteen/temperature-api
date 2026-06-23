@@ -25,4 +25,9 @@ COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", \
+     "-XX:+UseSerialGC", \
+     "-Xmx192m", \
+     "-Xss512k", \
+     "-XX:MaxMetaspaceSize=128m", \
+     "-jar", "app.jar"]
