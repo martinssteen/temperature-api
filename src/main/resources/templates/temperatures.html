@@ -10,8 +10,11 @@
             --text-muted: #6b7280;
             --line: rgba(0, 0, 0, 0.08);
             --card: rgba(0, 0, 0, 0.03);
+            --panel: #fcfcfb;
             --temp: #dc6b2f;
             --hum: #2f7fdc;
+            --temp-mark: #dc6b2f;
+            --hum-mark: #2f7fdc;
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -19,8 +22,11 @@
                 --text-muted: #9ca3af;
                 --line: rgba(255, 255, 255, 0.12);
                 --card: rgba(255, 255, 255, 0.04);
+                --panel: #1a1a19;
                 --temp: #f0965a;
                 --hum: #6aa9ef;
+                --temp-mark: #d9741f;
+                --hum-mark: #4287d8;
             }
         }
         * { box-sizing: border-box; }
@@ -34,13 +40,19 @@
             padding: 0.5rem;
             color: var(--text);
         }
+        .layout {
+            display: flex;
+            height: 100%;
+        }
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
             grid-auto-rows: 1fr;
             gap: 0.625rem;
-            height: 100%;
+            flex: 1 1 auto;
+            min-width: 0;
         }
+        .layout.open .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .card {
             display: flex;
             flex-direction: column;
@@ -50,10 +62,15 @@
             border: 1px solid var(--line);
             border-radius: 0.75rem;
             padding: clamp(0.5rem, 2.5vmin, 1.25rem);
+            padding: clamp(0.5rem, 6cqmin, 1.25rem);
             min-height: 0;
+            cursor: pointer;
+            container-type: size;
         }
+        .card:hover, .card:focus-visible { background: var(--line); outline: none; }
         .source {
             font-size: clamp(0.6875rem, 2.5vmin, 1rem);
+            font-size: clamp(0.625rem, 9cqmin, 1.125rem);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -61,12 +78,15 @@
         }
         .readings {
             display: flex;
+            flex-wrap: wrap;
             align-items: baseline;
-            gap: clamp(1rem, 4vmin, 2.5rem);
+            gap: 0 clamp(1rem, 4vmin, 2.5rem);
+            gap: 0 clamp(0.75rem, 10cqmin, 2.5rem);
         }
         .value {
             font-variant-numeric: tabular-nums;
             font-size: clamp(1.375rem, 9vmin, 4rem);
+            font-size: clamp(1.125rem, 22cqmin, 4rem);
             font-weight: 700;
             line-height: 1.1;
         }
@@ -80,6 +100,7 @@
         .updated {
             align-self: flex-end;
             font-size: clamp(0.6875rem, 2.2vmin, 0.9375rem);
+            font-size: clamp(0.625rem, 7cqmin, 0.9375rem);
             color: var(--text-muted);
             font-variant-numeric: tabular-nums;
             white-space: nowrap;
@@ -92,11 +113,139 @@
             border: 1px dashed var(--line);
             border-radius: 0.75rem;
         }
+
+        /* ---- history side panel ---- */
+        .detail {
+            flex: 0 0 0%;
+            min-width: 0;
+            margin-left: 0;
+            opacity: 0;
+            visibility: hidden;
+            overflow: hidden;
+            transition: flex-basis 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease, visibility 0s linear 0.35s;
+        }
+        .layout.open .detail {
+            flex-basis: 50%;
+            margin-left: 0.625rem;
+            opacity: 1;
+            visibility: visible;
+            transition: flex-basis 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease 0.1s;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .detail, .layout.open .detail { transition: none; }
+        }
+        .card.active { border-color: var(--text-muted); }
+        .panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem 0.625rem;
+            overflow: hidden;
+        }
+        .panel-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .panel-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .ranges {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .ranges button {
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font: inherit;
+            font-size: 0.6875rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        .ranges button:hover, .ranges button:focus-visible { background: var(--card); color: var(--text); outline: none; }
+        .ranges button.active { background: var(--line); color: var(--text); font-weight: 600; }
+        .panel-body.loading { opacity: 0.5; }
+        .close {
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font: inherit;
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        .close:hover, .close:focus-visible { background: var(--line); color: var(--text); outline: none; }
+        .panel-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+            flex: 1;
+            min-height: 0;
+        }
+        .chart-block {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+        .chart-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .chart { flex: 1; min-height: 0; position: relative; }
+        .chart svg { display: block; position: absolute; inset: 0; }
+        .chart-msg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+        .axis-text {
+            font-size: 0.625rem;
+            fill: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+        .tooltip {
+            position: absolute;
+            pointer-events: none;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 0.5rem;
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            z-index: 2;
+        }
+        .tooltip[hidden] { display: none; }
+        .tt-row { display: flex; align-items: center; gap: 0.375rem; }
+        .tt-key { display: inline-block; width: 0.75rem; height: 0; border-top: 2px solid; border-radius: 1px; }
+        .tt-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+        .tt-unit { font-weight: 400; color: var(--text-muted); }
+        .tt-time { color: var(--text-muted); font-variant-numeric: tabular-nums; margin-top: 0.125rem; }
     </style>
 </head>
 <body>
+<div class="layout" id="layout">
 <div class="grid">
-    <div class="card" th:each="s : ${sources}">
+    <div class="card" tabindex="0" role="button" th:each="s : ${sources}" th:attr="data-source=${s.source}">
         <div class="source" th:text="${s.source}">living-room</div>
         <div class="readings">
             <span class="value temp"><span th:text="${s.temperature != null} ? ${#numbers.formatDecimal(s.temperature.degreesCelsius, 1, 1)} : '-'">21.5</span><span class="unit">°C</span></span>
@@ -106,5 +255,310 @@
     </div>
     <div class="empty" th:if="${#lists.isEmpty(sources)}">No data yet</div>
 </div>
+
+<aside class="detail" id="detail">
+    <div class="panel" role="region" aria-labelledby="panelTitle">
+        <div class="panel-head">
+            <div class="panel-title" id="panelTitle"></div>
+            <button class="close" id="closeBtn" aria-label="Close">&times;</button>
+        </div>
+        <div class="ranges" id="ranges" role="group" aria-label="Time range">
+            <button type="button" data-hours="24">24 hours</button>
+            <button type="button" data-hours="168" class="active">7 days</button>
+            <button type="button" data-hours="720">30 days</button>
+        </div>
+        <div class="panel-body" id="panelBody">
+            <div class="chart-block">
+                <div class="chart-title">Temperature (°C)</div>
+                <div class="chart" id="tempChart"></div>
+            </div>
+            <div class="chart-block" id="humBlock">
+                <div class="chart-title">Humidity (%)</div>
+                <div class="chart" id="humChart"></div>
+            </div>
+        </div>
+        <div class="tooltip" id="tooltip" hidden></div>
+    </div>
+</aside>
+</div>
+
+<script>
+(function () {
+    var layout = document.getElementById('layout');
+    var panelTitle = document.getElementById('panelTitle');
+    var panelBody = document.getElementById('panelBody');
+    var tempChart = document.getElementById('tempChart');
+    var humChart = document.getElementById('humChart');
+    var humBlock = document.getElementById('humBlock');
+    var tooltip = document.getElementById('tooltip');
+    var closeBtn = document.getElementById('closeBtn');
+    var ranges = document.getElementById('ranges');
+    var current = null; // { temps: [...], hums: [...], domain: [from, to] } once loaded
+    var currentSource = null;
+    var rangeHours = 168;
+    var reqSeq = 0;
+
+    var SVG = 'http://www.w3.org/2000/svg';
+    function el(name, attrs) {
+        var e = document.createElementNS(SVG, name);
+        for (var k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
+    }
+    function pad2(n) { return (n < 10 ? '0' : '') + n; }
+    function fmtTime(d) { return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+    function fmtDate(d) { return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1); }
+
+    function niceTicks(min, max, count) {
+        if (min === max) { min -= 1; max += 1; }
+        var span = max - min;
+        var mag = Math.pow(10, Math.floor(Math.log(span / count) / Math.LN10));
+        var step = [1, 2, 2.5, 5, 10].map(function (m) { return m * mag; })
+            .filter(function (s) { return span / s <= count; })[0] || 10 * mag;
+        var out = [];
+        for (var v = Math.ceil(min / step) * step; v <= max + step * 1e-6; v += step) out.push(v);
+        return out;
+    }
+
+    function showMsg(host, text) {
+        host.innerHTML = '';
+        var d = document.createElement('div');
+        d.className = 'chart-msg';
+        d.textContent = text;
+        host.appendChild(d);
+    }
+
+    function drawChart(host, points, colorVar, unit, domain) {
+        host.innerHTML = '';
+        if (!points || points.length === 0) { showMsg(host, 'No data'); return; }
+
+        var W = host.clientWidth, H = host.clientHeight;
+        if (W < 40 || H < 40) return;
+        var m = { top: 8, right: 14, bottom: 20, left: 40 };
+        var iw = W - m.left - m.right, ih = H - m.top - m.bottom;
+
+        var xs = points.map(function (p) { return p.t; });
+        var ys = points.map(function (p) { return p.v; });
+        var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+        if (domain && isFinite(domain[0]) && isFinite(domain[1]) && domain[1] > domain[0]) {
+            x0 = domain[0]; x1 = domain[1];
+        }
+        if (x0 === x1) { x0 -= 3600000; x1 += 3600000; }
+        var yMin = Math.min.apply(null, ys), yMax = Math.max.apply(null, ys);
+        var yPadding = (yMax - yMin) * 0.15 || 0.5;
+        var yTicks = niceTicks(yMin - yPadding, yMax + yPadding, 4);
+        var y0 = Math.min(yTicks[0], yMin - yPadding);
+        var y1 = Math.max(yTicks[yTicks.length - 1], yMax + yPadding);
+
+        function X(t) { return m.left + (t - x0) / (x1 - x0) * iw; }
+        function Y(v) { return m.top + (1 - (v - y0) / (y1 - y0)) * ih; }
+
+        var svg = el('svg', { width: W, height: H });
+
+        // gridlines + y labels
+        yTicks.forEach(function (v) {
+            svg.appendChild(el('line', { x1: m.left, x2: m.left + iw, y1: Y(v), y2: Y(v), stroke: 'var(--line)', 'stroke-width': 1 }));
+            var t = el('text', { x: m.left - 6, y: Y(v) + 3, 'text-anchor': 'end', 'class': 'axis-text' });
+            t.textContent = (Math.round(v * 10) / 10).toString();
+            svg.appendChild(t);
+        });
+
+        // x labels: whole hours for short ranges, day boundaries for long ones
+        var spanH = (x1 - x0) / 3600000;
+        if (spanH <= 48) {
+            var stepH = Math.max(1, Math.ceil(spanH / 4));
+            var first = new Date(x0);
+            first.setMinutes(0, 0, 0);
+            if (first.getTime() < x0) first.setHours(first.getHours() + 1);
+            for (var t = first.getTime(); t <= x1; t += stepH * 3600000) {
+                var tx = el('text', { x: X(t), y: H - 5, 'text-anchor': 'middle', 'class': 'axis-text' });
+                tx.textContent = fmtTime(new Date(t));
+                svg.appendChild(tx);
+            }
+        } else {
+            var stepD = Math.max(1, Math.ceil(spanH / 24 / 5));
+            var firstD = new Date(x0);
+            firstD.setHours(0, 0, 0, 0);
+            if (firstD.getTime() < x0) firstD.setDate(firstD.getDate() + 1);
+            for (var td = firstD.getTime(); td <= x1; td += stepD * 86400000) {
+                var txd = el('text', { x: X(td), y: H - 5, 'text-anchor': 'middle', 'class': 'axis-text' });
+                txd.textContent = fmtDate(new Date(td));
+                svg.appendChild(txd);
+            }
+        }
+
+        // area wash + line
+        var line = points.map(function (p, i) { return (i ? 'L' : 'M') + X(p.t).toFixed(1) + ' ' + Y(p.v).toFixed(1); }).join('');
+        var area = el('path', { d: line + 'L' + X(points[points.length - 1].t).toFixed(1) + ' ' + (m.top + ih) + 'L' + X(points[0].t).toFixed(1) + ' ' + (m.top + ih) + 'Z', 'fill-opacity': 0.1, stroke: 'none' });
+        area.style.fill = 'var(' + colorVar + ')';
+        svg.appendChild(area);
+        var path = el('path', { d: line, fill: 'none', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
+        path.style.stroke = 'var(' + colorVar + ')';
+        svg.appendChild(path);
+
+        // end dot
+        var last = points[points.length - 1];
+        var dot = el('circle', { cx: X(last.t), cy: Y(last.v), r: 4 });
+        dot.style.fill = 'var(' + colorVar + ')';
+        svg.appendChild(dot);
+
+        // hover layer: crosshair + focus dot + tooltip
+        var cross = el('line', { y1: m.top, y2: m.top + ih, stroke: 'var(--text-muted)', 'stroke-width': 1, visibility: 'hidden' });
+        svg.appendChild(cross);
+        var focus = el('circle', { r: 4, visibility: 'hidden' });
+        focus.style.fill = 'var(' + colorVar + ')';
+        svg.appendChild(focus);
+
+        var hit = el('rect', { x: m.left, y: m.top, width: iw, height: ih, fill: 'transparent' });
+        hit.addEventListener('pointermove', function (ev) {
+            var rect = svg.getBoundingClientRect();
+            var px = ev.clientX - rect.left;
+            var best = 0, bestD = Infinity;
+            for (var i = 0; i < points.length; i++) {
+                var d = Math.abs(X(points[i].t) - px);
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            var p = points[best], cx = X(p.t);
+            cross.setAttribute('x1', cx); cross.setAttribute('x2', cx);
+            cross.setAttribute('visibility', 'visible');
+            focus.setAttribute('cx', cx); focus.setAttribute('cy', Y(p.v));
+            focus.setAttribute('visibility', 'visible');
+            showTooltip(host, cx, Y(p.v), p, colorVar, unit);
+        });
+        hit.addEventListener('pointerleave', function () {
+            cross.setAttribute('visibility', 'hidden');
+            focus.setAttribute('visibility', 'hidden');
+            tooltip.hidden = true;
+        });
+        svg.appendChild(hit);
+        host.appendChild(svg);
+    }
+
+    function showTooltip(host, cx, cy, p, colorVar, unit) {
+        tooltip.innerHTML = '';
+        var row = document.createElement('div');
+        row.className = 'tt-row';
+        var key = document.createElement('span');
+        key.className = 'tt-key';
+        key.style.borderTopColor = getComputedStyle(document.documentElement).getPropertyValue(colorVar).trim();
+        var val = document.createElement('span');
+        val.className = 'tt-val';
+        val.textContent = (Math.round(p.v * 10) / 10).toFixed(1);
+        var u = document.createElement('span');
+        u.className = 'tt-unit';
+        u.textContent = ' ' + unit;
+        row.appendChild(key); row.appendChild(val); row.appendChild(u);
+        var time = document.createElement('div');
+        time.className = 'tt-time';
+        var d = new Date(p.t);
+        time.textContent = fmtDate(d) + ' ' + fmtTime(d);
+        tooltip.appendChild(row); tooltip.appendChild(time);
+        tooltip.hidden = false;
+
+        var panelRect = tooltip.parentElement.getBoundingClientRect();
+        var hostRect = host.getBoundingClientRect();
+        var left = hostRect.left - panelRect.left + cx + 10;
+        var top = hostRect.top - panelRect.top + cy - 10;
+        if (left + tooltip.offsetWidth > panelRect.width - 8) left -= tooltip.offsetWidth + 20;
+        if (top + tooltip.offsetHeight > panelRect.height - 8) top = panelRect.height - tooltip.offsetHeight - 8;
+        tooltip.style.left = Math.max(4, left) + 'px';
+        tooltip.style.top = Math.max(4, top) + 'px';
+    }
+
+    function toPoints(list) {
+        return (list || []).map(function (d) {
+            return { t: new Date(d.recorded).getTime(), v: d.value };
+        }).filter(function (p) { return !isNaN(p.t); })
+          .sort(function (a, b) { return a.t - b.t; });
+    }
+
+    function render() {
+        if (!current) return;
+        drawChart(tempChart, current.temps, '--temp-mark', '°C', current.domain);
+        humBlock.style.display = current.hums.length ? '' : 'none';
+        if (current.hums.length) drawChart(humChart, current.hums, '--hum-mark', '%', current.domain);
+    }
+
+    function setActiveCard(source) {
+        document.querySelectorAll('.card[data-source]').forEach(function (card) {
+            card.classList.toggle('active', card.dataset.source === source);
+        });
+    }
+
+    function load(source, keepFrame) {
+        var seq = ++reqSeq;
+        if (keepFrame && current) {
+            panelBody.classList.add('loading');
+        } else {
+            current = null;
+            humBlock.style.display = '';
+            showMsg(tempChart, 'Loading…');
+            showMsg(humChart, 'Loading…');
+        }
+        var from = new Date(Date.now() - rangeHours * 3600000).toISOString();
+        fetch('/temperature/source/' + encodeURIComponent(source) + '?fromTimestamp=' + encodeURIComponent(from))
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                if (seq !== reqSeq || currentSource !== source) return;
+                panelBody.classList.remove('loading');
+                current = {
+                    temps: toPoints(data.temperatures),
+                    hums: toPoints(data.humidity),
+                    domain: [new Date(data.fromTimestamp).getTime(), new Date(data.toTimestamp).getTime()]
+                };
+                render();
+            })
+            .catch(function () {
+                if (seq !== reqSeq || currentSource !== source) return;
+                panelBody.classList.remove('loading');
+                current = null;
+                showMsg(tempChart, 'Could not load history');
+                humBlock.style.display = 'none';
+            });
+    }
+
+    function open(source) {
+        currentSource = source;
+        panelTitle.textContent = source;
+        layout.classList.add('open');
+        setActiveCard(source);
+        tooltip.hidden = true;
+        load(source, false);
+    }
+
+    function close() {
+        layout.classList.remove('open');
+        current = null;
+        currentSource = null;
+        setActiveCard(null);
+    }
+
+    function toggle(source) {
+        if (currentSource === source) close();
+        else open(source);
+    }
+
+    document.querySelectorAll('.card[data-source]').forEach(function (card) {
+        card.addEventListener('click', function () { toggle(card.dataset.source); });
+        card.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(card.dataset.source); }
+        });
+    });
+    ranges.querySelectorAll('button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var h = Number(btn.dataset.hours);
+            if (h === rangeHours) return;
+            rangeHours = h;
+            ranges.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+            if (currentSource !== null) load(currentSource, true);
+        });
+    });
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && currentSource !== null) close(); });
+    if (window.ResizeObserver) new ResizeObserver(render).observe(panelBody);
+})();
+</script>
 </body>
 </html>
