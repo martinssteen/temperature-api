@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 
 @Repository
-class SQLTemperateRepository(private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate) {
+class SQLTemperatureRepository(private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate) {
 
     fun recordTemperature(temperatureMessage: TemperatureMessage) {
         namedParameterJdbcTemplate.update(
