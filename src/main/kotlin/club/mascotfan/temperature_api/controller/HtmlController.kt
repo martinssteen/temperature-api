@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping
 class HtmlController(
     private val sqlTemperatureRepository: SQLTemperatureRepository
 ) {
-    @GetMapping("/temperatures/static")
+    @GetMapping("/temperature/static")
     fun webpage(model: Model): String {
         model.addAttribute("sources", sqlTemperatureRepository.getLastTemperatures().sources)
-        return "test"
+        return "temperatures"
     }
 }

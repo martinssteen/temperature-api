@@ -65,3 +65,6 @@ All configuration is supplied through environment variables (see
 The database schema (`temperatures` and `humidity` tables) is created
 automatically by Flyway on startup — see
 [`V1__INIT.sql`](src/main/resources/db/migration/V1__INIT.sql).
+
+## AI Disclaimer
+The static temperatures.html page to be used with our home server homepage was generated with the help of Claude Code.
