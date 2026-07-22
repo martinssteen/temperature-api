@@ -1,8 +1,12 @@
-# temperature-api
+# home-api
 
-A small Spring Boot (Kotlin) service that collects temperature and humidity
-readings from MQTT-enabled sensors, stores them in PostgreSQL, and exposes the
-latest reading per sensor over a simple HTTP API.
+A single collected place for the random bits of backend I need for my home
+server. Rather than spinning up a new service every time I want to store a
+reading, expose a small endpoint, or serve a little page, this is one Spring
+Boot (Kotlin) app that I keep adding features to as the need shows up.
+
+Think of it as a home-server junk drawer with a tidy front: one deployable, one
+database, one place to look.
 
 ## Disclaimer
 This is only a hobby project. I built this for fun, to learn, or for my own home setup.
@@ -15,7 +19,20 @@ This repository is also actually a mirror of my own local instance of Git (Gitea
 
 I'd rather put something imperfect out into the world than keep it hidden until it's perfect. Because honestly, if I didn't, I'd never share anything. :)
 
-## What it does
+## The idea
+
+One app, many little features. Each feature is self-contained — it might listen
+to something, store something, and/or serve something — but they all share the
+same runtime, config, and PostgreSQL database. When I need a new bit of
+home-server plumbing, it goes in here instead of becoming yet another service to
+deploy and babysit.
+
+## Features
+
+### 🌡️ Temperature & humidity
+
+Collects temperature and humidity readings from MQTT-enabled sensors, stores
+them in PostgreSQL, and serves them over HTTP (plus a small static page).
 
 1. **Ingest** — The app subscribes to one or more MQTT topics. Each message is
    routed by the last segment of its topic:
@@ -25,9 +42,9 @@ I'd rather put something imperfect out into the world than keep it hidden until 
 2. **Store** — Readings are written to the `temperatures` and `humidity` tables,
    each row tagged with a `source` and a `recorded_at` timestamp.
 3. **Serve** — `GET /temperature` returns the most recent temperature and
-   humidity for every known source.
+   humidity for every known source, with historic data also available.
 
-### Topic & payload format
+#### Topic & payload format
 
 The source name is taken from the **second** segment of the MQTT topic
 (`prefix/<source>/.../context`), and payloads are JSON in the
@@ -41,11 +58,14 @@ The source name is taken from the **second** segment of the MQTT topic
 For example, a message on `temperatures/livingroom/sensor/temperature:0` with
 payload `{"tC": 21.4}` records 21.4 °C for source `livingroom`.
 
+_More features will land here over time — this section is meant to grow._
+
 ## Tech stack
 
 - Kotlin 2.3 on Spring Boot 4.1 (Java 17)
 - Spring Integration MQTT (Eclipse Paho client)
 - Spring Data JDBC + PostgreSQL
+- Thymeleaf for the odd static/served page
 - Flyway for schema migrations
 - Maven (wrapper included)
 
@@ -54,17 +74,20 @@ payload `{"tC": 21.4}` records 21.4 °C for source `livingroom`.
 All configuration is supplied through environment variables (see
 [`.env.example`](.env.example)):
 
-| Variable      | Description                            |
-|---------------|----------------------------------------|
-| `DB_URL`      | JDBC URL for PostgreSQL.               |
-| `DB_USERNAME` | Database user                          |
-| `DB_PASSWORD` | Database password                      |
-| `MQTT_URL`    | MQTT broker URL                        |
-| `MQTT_TOPICS` | Comma-separated topics to subscribe to |
+| Variable      | Description                            | Used by      |
+|---------------|----------------------------------------|--------------|
+| `DB_URL`      | JDBC URL for PostgreSQL.               | All features |
+| `DB_USERNAME` | Database user                          | All features |
+| `DB_PASSWORD` | Database password                      | All features |
+| `MQTT_URL`    | MQTT broker URL                        | Temperature  |
+| `MQTT_TOPICS` | Comma-separated topics to subscribe to | Temperature  |
 
-The database schema (`temperatures` and `humidity` tables) is created
-automatically by Flyway on startup — see
-[`V1__INIT.sql`](src/main/resources/db/migration/V1__INIT.sql).
+The database schema is managed by Flyway and applied automatically on startup —
+see the migrations under
+[`src/main/resources/db/migration`](src/main/resources/db/migration). Each new
+feature adds its own migration(s).
 
 ## AI Disclaimer
-The static temperatures.html page to be used with our home server homepage was generated with the help of Claude Code.
+Parts of this project (such as the static `temperatures.html` page used with our
+home-server homepage) were generated with the help of Claude Code. This README
+was also written with the help of Claude Code.

@@ -1,6 +1,6 @@
-package club.mascotfan.temperature_api.config
+package club.mascotfan.home.temperature.config
 
-import club.mascotfan.temperature_api.MessageHandlerService
+import club.mascotfan.home.temperature.MessageHandlerService
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value

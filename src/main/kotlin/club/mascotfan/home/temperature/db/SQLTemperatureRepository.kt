@@ -1,9 +1,9 @@
-package club.mascotfan.temperature_api.db
+package club.mascotfan.home.temperature.db
 
-import club.mascotfan.temperature_api.controller.model.HistoricDataResponse
-import club.mascotfan.temperature_api.controller.model.TemperatureResponse
-import club.mascotfan.temperature_api.model.HumidityMessage
-import club.mascotfan.temperature_api.model.TemperatureMessage
+import club.mascotfan.home.temperature.controller.model.HistoricDataResponse
+import club.mascotfan.home.temperature.controller.model.TemperatureResponse
+import club.mascotfan.home.temperature.model.HumidityMessage
+import club.mascotfan.home.temperature.model.TemperatureMessage
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp

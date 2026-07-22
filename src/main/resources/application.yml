@@ -13,7 +13,10 @@ mqtt:
   url: ${MQTT_URL}
   topics: ${MQTT_TOPICS}
 
+
+temperature:
+  log-temperature: true
 logging:
   level:
-    club.mascotfan.temperature_api.MessageHandlerService: DEBUG
-    club.mascotfan.temperature_api.config.MqttConfig: TRACE
+    club.mascotfan.temperature_api.club.mascotfan.home-api.MessageHandlerService: DEBUG
+    club.mascotfan.temperature_api.config.club.mascotfan.home-api.config.MqttConfig: TRACE

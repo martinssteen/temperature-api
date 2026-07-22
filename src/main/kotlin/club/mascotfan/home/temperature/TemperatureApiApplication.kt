@@ -1,4 +1,4 @@
-package club.mascotfan.temperature_api
+package club.mascotfan.home.temperature
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

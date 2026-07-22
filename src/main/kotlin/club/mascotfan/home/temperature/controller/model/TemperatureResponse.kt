@@ -1,4 +1,4 @@
-package club.mascotfan.temperature_api.controller.model
+package club.mascotfan.home.temperature.controller.model
 
 import java.time.OffsetDateTime
 

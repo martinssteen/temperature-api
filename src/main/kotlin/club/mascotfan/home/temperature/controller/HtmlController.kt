@@ -1,6 +1,6 @@
-package club.mascotfan.temperature_api.controller
+package club.mascotfan.home.temperature.controller
 
-import club.mascotfan.temperature_api.db.SQLTemperatureRepository
+import club.mascotfan.home.temperature.db.SQLTemperatureRepository
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping

@@ -1,8 +1,8 @@
-package club.mascotfan.temperature_api.controller
+package club.mascotfan.home.temperature.controller
 
-import club.mascotfan.temperature_api.controller.model.HistoricDataResponse
-import club.mascotfan.temperature_api.controller.model.TemperatureResponse
-import club.mascotfan.temperature_api.db.SQLTemperatureRepository
+import club.mascotfan.home.temperature.controller.model.HistoricDataResponse
+import club.mascotfan.home.temperature.controller.model.TemperatureResponse
+import club.mascotfan.home.temperature.db.SQLTemperatureRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
