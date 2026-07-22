@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class TemperatureApiApplicationTests {
+class HomeApiApplicationTests {
 
 	@Test
 	fun contextLoads() {

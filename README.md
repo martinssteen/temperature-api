@@ -29,6 +29,7 @@ deploy and babysit.
 
 ## Features
 
+
 ### 🌡️ Temperature & humidity
 
 Collects temperature and humidity readings from MQTT-enabled sensors, stores
@@ -86,6 +87,11 @@ The database schema is managed by Flyway and applied automatically on startup �
 see the migrations under
 [`src/main/resources/db/migration`](src/main/resources/db/migration). Each new
 feature adds its own migration(s).
+
+### Docker Passthrough
+```bash
+socat   TCP-LISTEN:23750,bind=127.0.0.1,reuseaddr,fork   EXEC:"ssh truenas_admin@192.168.50.137 docker system dial-stdio",nofork
+```
 
 ## AI Disclaimer
 Parts of this project (such as the static `temperatures.html` page used with our
